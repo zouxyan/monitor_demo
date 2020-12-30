@@ -24,10 +24,10 @@ type FiscoScanner struct {
 	SDK *client.Client
 	chainId uint64
 	currh uint64
-	output chan <-*EventsPkg
+	output chan <-*core.EventsPkg
 }
 
-func NewFiscoScanner(o chan <-*EventsPkg, conf *conf.FiscoConf) (*FiscoScanner, error) {
+func NewFiscoScanner(o chan <-*core.EventsPkg, conf *conf.FiscoConf) (*FiscoScanner, error) {
 	eng, err := core.NewEthLikeEngine(conf.EthCommon)
 	if err != nil {
 		return nil, err
@@ -121,8 +121,8 @@ func (scanner *FiscoScanner) check(height uint64) error {
 				continue
 			}
 
-			scanner.output <- &EventsPkg {
-				Type: FiscoTy,
+			scanner.output <- &core.EventsPkg {
+				Type: core.FiscoTy,
 				Contract: v.Address,
 				EventsInATx: logs,
 				ChainId: scanner.chainId,

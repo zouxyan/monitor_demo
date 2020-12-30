@@ -11,7 +11,6 @@ import (
 	"github.com/hyperledger/fabric-sdk-go/pkg/fabsdk"
 	"github.com/ontio/monitor_demo/conf"
 	"github.com/ontio/monitor_demo/core/internal/github.com/hyperledger/fabric/protoutil"
-	"github.com/ontio/monitor_demo/scanners"
 	"os"
 	"strings"
 )
@@ -25,7 +24,7 @@ type FabricEngine struct {
 }
 
 func NewFabricEngine(conf *conf.FabConf) (*FabricEngine, error) {
-	_ = os.Setenv("FABRIC_MSP_PATH", conf.MSPPath)
+	_ = os.Setenv("FABRIC_MSP_PATH" + conf.Name, conf.MSPPath)
 
 	sdk, err := fabsdk.New(config.FromFile(conf.SDKConf))
 	if err != nil {
@@ -54,8 +53,8 @@ func NewFabricEngine(conf *conf.FabConf) (*FabricEngine, error) {
 	}, nil
 }
 
-func (eng *FabricEngine) EventFilter(data [][]byte) ([]*scanners.EventsPkg, error) {
-	res := make([]*scanners.EventsPkg, 0)
+func (eng *FabricEngine) EventFilter(data [][]byte) ([]*EventsPkg, error) {
+	res := make([]*EventsPkg, 0)
 	for _, v := range data {
 		xx, _ := protoutil.GetEnvelopeFromBlock(v)
 		cas, _ := protoutil.GetActionsFromEnvelopeMsg(xx)
@@ -64,9 +63,9 @@ func (eng *FabricEngine) EventFilter(data [][]byte) ([]*scanners.EventsPkg, erro
 			continue
 		}
 
-		pkg := &scanners.EventsPkg{
+		pkg := &EventsPkg{
 			Contract: cas[0].ChaincodeId.Name,
-			Type:     scanners.FabricTy,
+			Type:     FabricTy,
 			ChainId:  eng.EngConf.ChainId,
 			EventsInATx: make(map[string]map[string]interface{}),
 		}
@@ -76,11 +75,8 @@ func (eng *FabricEngine) EventFilter(data [][]byte) ([]*scanners.EventsPkg, erro
 			if len(chaincodeEvent.TxId) == 0 {
 				continue
 			}
-			words, ok := eng.EngConf.EventKeyWord[chaincodeEvent.ChaincodeId]
-			if !ok {
-				continue
-			}
-			for _, w := range words {
+
+			for _, w := range eng.EngConf.EventKeyWord {
 				if strings.Contains(chaincodeEvent.EventName, w) {
 					tx, _ := eng.LedgerCLi.QueryTransaction(fab.TransactionID(chaincodeEvent.TxId))
 					if tx.ValidationCode != 0 {

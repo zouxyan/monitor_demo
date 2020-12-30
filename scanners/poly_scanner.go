@@ -9,10 +9,10 @@ import (
 
 type PolyScanner struct {
 	Eng *core.PolyEngine
-	output chan <-*EventsPkg
+	output chan <-*core.EventsPkg
 }
 
-func NewPolyScanner(o chan <-*EventsPkg, conf *conf.PolyConf) (*PolyScanner, error) {
+func NewPolyScanner(o chan <-*core.EventsPkg, conf *conf.PolyConf) (*PolyScanner, error) {
 	eng, err := core.NewPolyEngine(conf)
 	if err != nil {
 		return nil, err

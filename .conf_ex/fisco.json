@@ -1,0 +1,18 @@
+{
+  "SDKFile": ".conf_ex/fisco_sdk.toml",
+  "EthCommon": {
+    "Name": "",
+    "URL": "",
+    "Contracts": {
+      "0xxxx": ""
+    },
+    "EventName": {
+      "0xxxx": [
+        "CrossChainEvent",
+        "VerifyHeaderAndExecuteTxEvent"
+      ]
+    }
+  },
+  "ChainId": 7,
+  "StartHeight": 1
+}

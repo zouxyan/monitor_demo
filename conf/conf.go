@@ -1,18 +1,13 @@
 package conf
 
-const ZeroChainId = 0
-
-var (
-	RConf *RootConf
+import (
+	"encoding/json"
+	"io/ioutil"
 )
 
-func InitRootConf(f string) {
-
-}
-
 type RootConf struct {
-	EthLikeArr []*EthLikeConf
-	FabArr []*FabConf
+	ChainsConfMap map[string]string
+	Consumers []string
 }
 
 type FiscoConf struct {
@@ -31,13 +26,14 @@ type EthLikeConf struct {
 
 type FabConf struct {
 	Name string
-	EventKeyWord map[string][]string
+	EventKeyWord []string
 	SDKConf string
 	MSPPath string
 	Channel string
 	User string
 	Org string
 	ChainId uint64
+	StartHeight uint64
 }
 
 type PolyConf struct {
@@ -45,3 +41,14 @@ type PolyConf struct {
 	StartHeight uint32
 }
 
+func LoadConf(ins interface{}, file string) error {
+	raw, err := ioutil.ReadFile(file)
+	if err != nil {
+		return err
+	}
+	if err = json.Unmarshal(raw, ins); err != nil {
+		return err
+	}
+
+	return nil
+}

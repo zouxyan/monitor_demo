@@ -1,4 +1,6 @@
-package scanners
+package core
+
+const ZeroChainId = 0
 
 type ChainType int
 

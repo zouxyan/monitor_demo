@@ -1,0 +1,11 @@
+{
+  "Name": "",
+  "EventKeyWord": ["from_poly", "to_poly", "from_ccm"],
+  "SDKConf": ".conf_ex/fab_conf.yaml",
+  "MSPPath": "",
+  "Channel": "mychannel",
+  "User": "Admin",
+  "Org": "Org1",
+  "ChainId": 8,
+  "StartHeight": 1
+}

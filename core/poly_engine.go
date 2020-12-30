@@ -2,7 +2,6 @@ package core
 
 import (
 	"github.com/ontio/monitor_demo/conf"
-	"github.com/ontio/monitor_demo/scanners"
 	"github.com/polynetwork/poly-go-sdk"
 )
 
@@ -21,13 +20,13 @@ func NewPolyEngine(conf *conf.PolyConf) (*PolyEngine, error) {
 	}, nil
 }
 
-func (eng *PolyEngine) EventFilter(height uint32) ([]*scanners.EventsPkg, error) {
+func (eng *PolyEngine) EventFilter(height uint32) ([]*EventsPkg, error) {
 	events, err := eng.Cli.GetSmartContractEventByBlock(height)
 	if err != nil {
 		return nil, err
 	}
 
-	res := make([]*scanners.EventsPkg, 0)
+	res := make([]*EventsPkg, 0)
 	for _, event := range events {
 		arr := make(map[string]map[string]interface{})
 		for _, notify := range event.Notify {
@@ -47,10 +46,10 @@ func (eng *PolyEngine) EventFilter(height uint32) ([]*scanners.EventsPkg, error)
 		}
 
 		if len(arr) > 0 {
-			res = append(res, &scanners.EventsPkg{
+			res = append(res, &EventsPkg{
 				TxHash: event.TxHash,
-				ChainId: conf.ZeroChainId,
-				Type: scanners.PolyTy,
+				ChainId: ZeroChainId,
+				Type: PolyTy,
 				Contract: "",
 				EventsInATx: arr,
 			})

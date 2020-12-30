@@ -3,9 +3,10 @@ package consumers
 import (
 	"encoding/hex"
 	"fmt"
+	"github.com/ontio/monitor_demo/core"
 	"github.com/ontio/monitor_demo/log"
-	"github.com/ontio/monitor_demo/scanners"
 	"github.com/polynetwork/poly/common"
+	common2 "github.com/polynetwork/poly/native/service/cross_chain_manager/common"
 	"time"
 )
 
@@ -18,7 +19,7 @@ const (
 )
 
 type Stage struct {
-	ChainTy scanners.ChainType
+	ChainTy core.ChainType
 	ChainId uint64
 	TxHash string
 }
@@ -62,28 +63,38 @@ func (s *Status) Show() string {
 }
 
 type CrossStatusProcessor struct {
-	recev chan <-*scanners.EventsPkg
+	recev chan *core.EventsPkg
 	data map[string]*Status
 }
 
-func (p *CrossStatusProcessor) Receiving() {
+func NewCrossStatusProcessor(bus chan *core.EventsPkg) *CrossStatusProcessor {
+	return &CrossStatusProcessor{
+		data: make(map[string]*Status),
+		recev: bus,
+	}
+}
+
+func (p *CrossStatusProcessor) Do() {
+	go p.showStatus()
 	for item := range p.recev {
 		p.getEventStage(item)
 	}
 }
 
-func (p *CrossStatusProcessor) getEventStage(item *scanners.EventsPkg) {
+func (p *CrossStatusProcessor) getEventStage(item *core.EventsPkg) {
 	switch item.Type {
-	case scanners.FiscoTy:
+	case core.FiscoTy:
 		p.handleFiscoEvent(item)
-	case scanners.PolyTy:
+	case core.PolyTy:
 		p.handlePolyEvent(item)
-	case scanners.FabricTy:
-
+	case core.FabricTy:
+		p.handleFabricEvent(item)
+	default:
+		log.Warnf("CrossStatusProcessor: Unsupported type: %s", item.Type.String())
 	}
 }
 
-func (p *CrossStatusProcessor) handleFiscoEvent(item *scanners.EventsPkg) {
+func (p *CrossStatusProcessor) handleFiscoEvent(item *core.EventsPkg) {
 	e, ok := item.EventsInATx["CrossChainEvent"]
 	if ok {
 		txId := e["txId"].([]byte)
@@ -91,7 +102,7 @@ func (p *CrossStatusProcessor) handleFiscoEvent(item *scanners.EventsPkg) {
 		k := makeCCKey(txId, item.ChainId, toChainId)
 		v, ok := p.data[k]
 		stage := &Stage{
-			ChainTy: scanners.FiscoTy,
+			ChainTy: core.FiscoTy,
 			ChainId: item.ChainId,
 			TxHash: item.TxHash,
 		}
@@ -116,7 +127,7 @@ func (p *CrossStatusProcessor) handleFiscoEvent(item *scanners.EventsPkg) {
 		k := makeCCKey(txId, fromChainID, item.ChainId)
 		v, ok := p.data[k]
 		stage := &Stage{
-			ChainTy: scanners.FiscoTy,
+			ChainTy: core.FiscoTy,
 			ChainId: item.ChainId,
 			TxHash: item.TxHash,
 		}
@@ -137,7 +148,7 @@ func (p *CrossStatusProcessor) handleFiscoEvent(item *scanners.EventsPkg) {
 	}
 }
 
-func (p *CrossStatusProcessor) handlePolyEvent(item *scanners.EventsPkg) {
+func (p *CrossStatusProcessor) handlePolyEvent(item *core.EventsPkg) {
 	for _, v := range item.EventsInATx {
 		txId := v["txid"].(string)
 		fromChainId := v["from"].(uint64)
@@ -147,7 +158,7 @@ func (p *CrossStatusProcessor) handlePolyEvent(item *scanners.EventsPkg) {
 
 		v, ok := p.data[k]
 		stage := &Stage{
-			ChainTy: scanners.PolyTy,
+			ChainTy: core.PolyTy,
 			ChainId: item.ChainId,
 			TxHash: item.TxHash,
 		}
@@ -164,6 +175,64 @@ func (p *CrossStatusProcessor) handlePolyEvent(item *scanners.EventsPkg) {
 			}
 		} else {
 			v.AddStage(stage, PolyStage)
+		}
+	}
+}
+
+func (p *CrossStatusProcessor) handleFabricEvent(item *core.EventsPkg) {
+	v, ok := item.EventsInATx["from_poly"]
+	if ok {
+		merkleValue := new(common2.ToMerkleValue)
+		if err := merkleValue.Deserialization(common.NewZeroCopySource(v["raw"].([]byte))); err == nil {
+			k := makeCCKey(merkleValue.MakeTxParam.TxHash, merkleValue.FromChainID, item.ChainId)
+			val, ok := p.data[k]
+			stage := &Stage{
+				ChainId: item.ChainId,
+				TxHash: item.TxHash,
+				ChainTy: item.Type,
+			}
+			if !ok {
+				p.data[k] = &Status{
+					From: merkleValue.FromChainID,
+					To: item.ChainId,
+					TxId: merkleValue.MakeTxParam.TxHash,
+					Stages: []*Stage{
+						nil,
+						nil,
+						stage,
+					},
+				}
+			} else {
+				val.AddStage(stage, ToStage)
+			}
+		}
+	}
+
+	v, ok = item.EventsInATx["from_ccm"]
+	if ok {
+		param := new(common2.MakeTxParam)
+		if err := param.Deserialization(common.NewZeroCopySource(v["raw"].([]byte))); err == nil {
+			k := makeCCKey(param.TxHash, item.ChainId, param.ToChainID)
+			val, ok := p.data[k]
+			stage := &Stage{
+				ChainId: item.ChainId,
+				TxHash: item.TxHash,
+				ChainTy: item.Type,
+			}
+			if !ok {
+				p.data[k] = &Status{
+					From: item.ChainId,
+					To: item.ChainId,
+					TxId: param.TxHash,
+					Stages: []*Stage{
+						stage,
+						nil,
+						nil,
+					},
+				}
+			} else {
+				val.AddStage(stage, FromStage)
+			}
 		}
 	}
 }
@@ -190,7 +259,9 @@ func (p *CrossStatusProcessor) PrintStatus() {
 	for {
 		select {
 		case <-tick.C:
-			log.Info(p.showStatus())
+			if len(p.data) > 0 {
+				log.Info(p.showStatus())
+			}
 		}
 	}
 }

@@ -1,0 +1,25 @@
+
+[Network]
+#type rpc or channel
+Type="rpc"
+CAFile=".wallets/fisco/ca.crt"
+AGENCYFile=".wallets/fisco/gmagency.crt"
+Cert=".wallets/fisco/sdk.crt"
+Key=".wallets/fisco/sdk.key"
+[[Network.Connection]]
+NodeURL="106.75.233.59:8545"
+GroupID=1
+# [[Network.Connection]]
+# NodeURL="127.0.0.1:20200"
+# GroupID=2
+
+[Account]
+# only support PEM format for now
+KeyFile=".wallets/fisco/0x34f00110bad3236f01468799d44fe04d7deb25f0.pem"
+
+[Chain]
+ChainID=1
+SMCrypto=true
+
+[log]
+Path="./"

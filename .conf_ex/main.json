@@ -1,0 +1,10 @@
+{
+  "ChainsConfMap": {
+    "fisco": ".conf_ex/fisco.json",
+    "fabric": "",
+    "poly": ".conf_ex/poly.json"
+  },
+  "Consumers": [
+    "core"
+  ]
+}
