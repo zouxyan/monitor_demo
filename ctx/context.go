@@ -30,7 +30,7 @@ func InitCtx(file string) {
 	if err := conf.LoadConf(root, file); err != nil {
 		panic(err)
 	}
-	for k, v := range root.ChainsConfMap {
+	for v, k := range root.ChainsConfMap {
 		switch k {
 		case "fisco":
 			c := &conf.FiscoConf{}

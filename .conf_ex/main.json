@@ -1,8 +1,8 @@
 {
   "ChainsConfMap": {
-    "fisco": ".conf_ex/fisco.json",
-    "fabric": "",
-    "poly": ".conf_ex/poly.json"
+    ".conf_ex/fisco.json": "fisco",
+    "": "fabric",
+    ".conf_ex/poly.json": "poly"
   },
   "Consumers": [
     "core"
