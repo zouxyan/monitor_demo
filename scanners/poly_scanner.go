@@ -30,9 +30,11 @@ func (scanner *PolyScanner) Do() {
 		panic(err)
 	}
 
-	if currh > scanner.Eng.EngConf.StartHeight {
+	if currh > scanner.Eng.EngConf.StartHeight && scanner.Eng.EngConf.StartHeight != 0 {
 		currh = scanner.Eng.EngConf.StartHeight
 	}
+
+	log.Infof("Poly (URL: %s) scanner start from %d", scanner.Eng.EngConf.URL, currh)
 
 	updateTicker := time.NewTicker(time.Second)
 	for {

@@ -17,9 +17,15 @@ type EthLikeEngine struct {
 }
 
 func NewEthLikeEngine(conf *conf.EthLikeConf) (*EthLikeEngine, error) {
-	cli, err := ethclient.Dial(conf.URL)
-	if err != nil {
-		return nil, err
+	var (
+		cli *ethclient.Client
+		err error
+	)
+	if conf.URL != "" {
+		cli, err = ethclient.Dial(conf.URL)
+		if err != nil {
+			return nil, err
+		}
 	}
 	abis := make(map[string]abi.ABI)
 	for k, v := range conf.Contracts {
@@ -49,16 +55,19 @@ func (e *EthLikeEngine) EventFilter(l types.Log) (string, map[string]map[string]
 		return "", nil, fmt.Errorf("contract %s not found in ABIs", contract)
 	}
 	for _, v := range words {
-		_, ok = a.Events[v]
+		_, ok := a.Events[v]
 		if !ok {
 			log.Warnf("event %s not found in contract %s", v, contract)
 			continue
 		}
 		event := make(map[string]interface{})
 		if err := UnpackLogIntoMap(a, event, v, l); err != nil {
-			return "", nil, err
+			continue
 		}
 		res[v] = event
+	}
+	if len(res) == 0 {
+		return contract, nil, fmt.Errorf("no event found for this log in contract %s", contract)
 	}
 	return contract, res, nil
 }

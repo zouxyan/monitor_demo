@@ -31,9 +31,11 @@ func (scanner *FabricScanner) Do() {
 	}
 	curr := info.BCI.Height - 1
 	left := curr - 1
-	if scanner.Eng.EngConf.StartHeight < left {
+	if scanner.Eng.EngConf.StartHeight < left && scanner.Eng.EngConf.StartHeight != 0{
 		left = scanner.Eng.EngConf.StartHeight
 	}
+
+	log.Infof("Fabric (URL: %s) scanner start from %d", "no", left)
 
 	updateTicker := time.NewTicker(time.Second)
 	for {

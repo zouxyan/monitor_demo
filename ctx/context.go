@@ -7,6 +7,7 @@ import (
 	"github.com/ontio/monitor_demo/core"
 	"github.com/ontio/monitor_demo/log"
 	"github.com/ontio/monitor_demo/scanners"
+	"strings"
 )
 
 var (
@@ -35,6 +36,14 @@ func InitCtx(file string) {
 			c := &conf.FiscoConf{}
 			if err := conf.LoadConf(c, v); err != nil {
 				panic(err)
+			}
+			for k, v := range c.EthCommon.EventName {
+				delete(c.EthCommon.EventName, k)
+				c.EthCommon.EventName[strings.ToLower(k)] = v
+			}
+			for k, v := range c.EthCommon.Contracts {
+				delete(c.EthCommon.Contracts, k)
+				c.EthCommon.Contracts[strings.ToLower(k)] = v
 			}
 			s, err := scanners.NewFiscoScanner(Ctx.Bus, c)
 			if err != nil {

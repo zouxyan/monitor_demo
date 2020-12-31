@@ -39,8 +39,8 @@ func (eng *PolyEngine) EventFilter(height uint32) ([]*EventsPkg, error) {
 				txid := states[3].(string)
 				arr[txid] = map[string]interface{}{
 					"txid": txid,
-					"from": states[1].(uint64),
-					"to": states[2].(uint64),
+					"from": uint64(states[1].(float64)),
+					"to": uint64(states[2].(float64)),
 				}
 			}
 		}

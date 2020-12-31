@@ -56,7 +56,7 @@ func (scanner *FiscoScanner) Do() {
 		panic(err)
 	}
 	left--
-	if left > scanner.currh {
+	if left > scanner.currh && scanner.currh != 0{
 		left = scanner.currh
 	}
 	log.Infof("Fisco (URL: %s) scanner start from %d", scanner.Eng.EngConf.URL, left)
@@ -105,7 +105,6 @@ func (scanner *FiscoScanner) check(height uint64) error {
 			continue
 		}
 		for _, v := range recp.Logs {
-
 			topics := make([]common.Hash, len(v.Topics))
 			for i, t := range v.Topics {
 				topics[i] = common.HexToHash(t.(string))
@@ -116,8 +115,7 @@ func (scanner *FiscoScanner) check(height uint64) error {
 				Topics:  topics,
 				Data:    rawData,
 			})
-			if err != nil {
-				log.Errorf("failed when tx %s", v.TransactionHash)
+			if len(logs) == 0 || err != nil {
 				continue
 			}
 

@@ -75,7 +75,7 @@ func NewCrossStatusProcessor(bus chan *core.EventsPkg) *CrossStatusProcessor {
 }
 
 func (p *CrossStatusProcessor) Do() {
-	go p.showStatus()
+	go p.PrintStatus()
 	for item := range p.recev {
 		p.getEventStage(item)
 	}
@@ -113,6 +113,8 @@ func (p *CrossStatusProcessor) handleFiscoEvent(item *core.EventsPkg) {
 				TxId: txId,
 				Stages: []*Stage{
 					stage,
+					nil,
+					nil,
 				},
 			}
 		} else {
@@ -249,7 +251,7 @@ func makeCCKey(txid []byte, from, to uint64) string {
 func (p *CrossStatusProcessor) showStatus() string {
 	res := "{\n"
 	for i, v := range p.data {
-		res += fmt.Sprintf("\tNo.%d, info: %s\n", i, v.Show())
+		res += fmt.Sprintf("\tKEY: %s, info: %s\n", i, v.Show())
 	}
 	return res + "}\n"
 }
