@@ -1,4 +1,4 @@
-module github.com/ontio/monitor_demo
+module github.com/polynetwork/monitor_demo
 
 go 1.15
 

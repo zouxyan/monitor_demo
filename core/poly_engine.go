@@ -1,7 +1,7 @@
 package core
 
 import (
-	"github.com/ontio/monitor_demo/conf"
+	"github.com/polynetwork/monitor_demo/conf"
 	"github.com/polynetwork/poly-go-sdk"
 )
 

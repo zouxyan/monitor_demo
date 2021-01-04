@@ -1,5 +1,4 @@
 {
-  "SDKFile": ".conf_ex/fisco_sdk.toml",
   "EthCommon": {
     "Name": "",
     "URL": "",
@@ -13,6 +12,7 @@
       ]
     }
   },
-  "ChainId": 7,
-  "StartHeight": 0
+  "ChainId": 2,
+  "StartHeight": 0,
+  "BlocksToWait": 12
 }

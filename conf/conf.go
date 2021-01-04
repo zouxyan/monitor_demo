@@ -10,6 +10,13 @@ type RootConf struct {
 	Consumers []string
 }
 
+type EthLikeConf struct {
+	Name string
+	URL string
+	Contracts map[string]string
+	EventName map[string][]string
+}
+
 type FiscoConf struct {
 	SDKFile string
 	EthCommon *EthLikeConf
@@ -17,11 +24,11 @@ type FiscoConf struct {
 	StartHeight uint64
 }
 
-type EthLikeConf struct {
-	Name string
-	URL string
-	Contracts map[string]string
-	EventName map[string][]string
+type EthereumConf struct {
+	EthCommon *EthLikeConf
+	ChainId uint64
+	StartHeight uint64
+	BlocksToWait uint64
 }
 
 type FabConf struct {

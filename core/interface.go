@@ -1,4 +1,4 @@
-package ctx
+package core
 
 type Doer interface {
 	Do()

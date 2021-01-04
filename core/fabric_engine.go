@@ -9,8 +9,8 @@ import (
 	"github.com/hyperledger/fabric-sdk-go/pkg/common/providers/fab"
 	"github.com/hyperledger/fabric-sdk-go/pkg/core/config"
 	"github.com/hyperledger/fabric-sdk-go/pkg/fabsdk"
-	"github.com/ontio/monitor_demo/conf"
-	"github.com/ontio/monitor_demo/core/internal/github.com/hyperledger/fabric/protoutil"
+	"github.com/polynetwork/monitor_demo/conf"
+	"github.com/polynetwork/monitor_demo/core/internal/github.com/hyperledger/fabric/protoutil"
 	"os"
 	"strings"
 )

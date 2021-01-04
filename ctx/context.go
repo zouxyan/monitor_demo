@@ -2,11 +2,11 @@ package ctx
 
 import (
 	"fmt"
-	"github.com/ontio/monitor_demo/conf"
-	"github.com/ontio/monitor_demo/consumers"
-	"github.com/ontio/monitor_demo/core"
-	"github.com/ontio/monitor_demo/log"
-	"github.com/ontio/monitor_demo/scanners"
+	"github.com/polynetwork/monitor_demo/conf"
+	"github.com/polynetwork/monitor_demo/consumers"
+	"github.com/polynetwork/monitor_demo/core"
+	"github.com/polynetwork/monitor_demo/log"
+	"github.com/polynetwork/monitor_demo/scanners"
 	"strings"
 )
 
@@ -15,16 +15,16 @@ var (
 )
 
 type Context struct {
-	Scanners []Doer
+	Scanners []core.Doer
 	Bus chan *core.EventsPkg
-	Consumers []Doer
+	Consumers []core.Doer
 }
 
 func InitCtx(file string) {
 	Ctx = &Context{
-		Scanners: make([]Doer, 0),
+		Scanners: make([]core.Doer, 0),
 		Bus: make(chan *core.EventsPkg),
-		Consumers: make([]Doer, 0),
+		Consumers: make([]core.Doer, 0),
 	}
 	root := &conf.RootConf{}
 	if err := conf.LoadConf(root, file); err != nil {
@@ -63,6 +63,15 @@ func InitCtx(file string) {
 			Ctx.Scanners = append(Ctx.Scanners, s)
 
 		case "ethereum":
+			c := &conf.EthereumConf{}
+			if err := conf.LoadConf(c, v); err != nil {
+				panic(err)
+			}
+			s, err := scanners.NewEthScanner(Ctx.Bus, c)
+			if err != nil {
+				panic(err)
+			}
+			Ctx.Scanners = append(Ctx.Scanners, s)
 
 		case "poly":
 			c := &conf.PolyConf{}

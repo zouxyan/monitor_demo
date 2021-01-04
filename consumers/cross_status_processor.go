@@ -3,8 +3,8 @@ package consumers
 import (
 	"encoding/hex"
 	"fmt"
-	"github.com/ontio/monitor_demo/core"
-	"github.com/ontio/monitor_demo/log"
+	"github.com/polynetwork/monitor_demo/core"
+	"github.com/polynetwork/monitor_demo/log"
 	"github.com/polynetwork/poly/common"
 	common2 "github.com/polynetwork/poly/native/service/cross_chain_manager/common"
 	"time"
@@ -99,6 +99,12 @@ func (p *CrossStatusProcessor) handleFiscoEvent(item *core.EventsPkg) {
 	if ok {
 		txId := e["txId"].([]byte)
 		toChainId := e["toChainId"].(uint64)
+		//TODO: deserialize MakeTxParam
+		rawData := e["rawdata"].([]byte)
+
+		param := &common2.MakeTxParam{}
+		_ = param.Deserialization(common.NewZeroCopySource(rawData))
+
 		k := makeCCKey(txId, item.ChainId, toChainId)
 		v, ok := p.data[k]
 		stage := &Stage{

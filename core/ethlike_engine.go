@@ -5,8 +5,8 @@ import (
 	"github.com/ethereum/go-ethereum/accounts/abi"
 	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/ethclient"
-	"github.com/ontio/monitor_demo/conf"
-	"github.com/ontio/monitor_demo/log"
+	"github.com/polynetwork/monitor_demo/conf"
+	"github.com/polynetwork/monitor_demo/log"
 	"strings"
 )
 

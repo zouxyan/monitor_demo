@@ -1,9 +1,9 @@
 package scanners
 
 import (
-	"github.com/ontio/monitor_demo/conf"
-	"github.com/ontio/monitor_demo/core"
-	"github.com/ontio/monitor_demo/log"
+	"github.com/polynetwork/monitor_demo/conf"
+	"github.com/polynetwork/monitor_demo/core"
+	"github.com/polynetwork/monitor_demo/log"
 	"time"
 )
 
